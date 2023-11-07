@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/Ubbo-Sathla/mfa/pkg/mfa"
+	"github.com/olekukonko/tablewriter"
+
+	"os"
 )
 
 func main() {
@@ -10,7 +13,12 @@ func main() {
 		return
 	}
 	c := mfa.GetConfig()
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name", "Issuer", "Account", "Code"})
+
 	for _, j := range c {
-		j.Display()
+		j.Load()
+		table.Append([]string{j.Name, j.Issuer, j.AccountName, j.GenerateCode()})
 	}
+	table.Render()
 }

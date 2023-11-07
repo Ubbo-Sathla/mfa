@@ -1,28 +1,33 @@
 package mfa
 
 import (
-	"fmt"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"time"
 )
 
-func (m *Mfa) GenerateCode(secret string, period uint, digits otp.Digits, algorithm otp.Algorithm) string {
-	code, err := totp.GenerateCodeCustom(secret, time.Now(), totp.ValidateOpts{
-		Period:    period,
+func (m *Mfa) GenerateCode() string {
+	code, err := totp.GenerateCodeCustom(m.Secret, time.Now(), totp.ValidateOpts{
+		Period:    m.Period,
 		Skew:      1,
-		Digits:    digits,
-		Algorithm: algorithm,
+		Digits:    m.Digits,
+		Algorithm: m.Algorithm,
 	})
 	if err != nil {
 		panic(err)
 	}
 	return code
 }
-func (m *Mfa) Display() {
+func (m *Mfa) Load() {
 	key, err := otp.NewKeyFromURL(m.Url)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Name: %s Issuer: %s Account: %s Code: %s\n", m.Name, key.Issuer(), key.AccountName(), m.GenerateCode(key.Secret(), uint(key.Period()), key.Digits(), key.Algorithm()))
+	m.Period = uint(key.Period())
+	m.Digits = key.Digits()
+	m.Algorithm = key.Algorithm()
+	m.Secret = key.Secret()
+
+	m.Issuer = key.Issuer()
+	m.AccountName = key.AccountName()
 }

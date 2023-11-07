@@ -1,6 +1,7 @@
 package mfa
 
 import (
+	"github.com/pquerna/otp"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os/user"
@@ -12,8 +13,14 @@ var (
 )
 
 type Mfa struct {
-	Name string `yaml:"name"`
-	Url  string `yaml:"url"`
+	Name        string `yaml:"name"`
+	Url         string `yaml:"url"`
+	Secret      string
+	Issuer      string
+	AccountName string
+	Period      uint
+	Digits      otp.Digits
+	Algorithm   otp.Algorithm
 }
 
 func GetConfig() []*Mfa {
